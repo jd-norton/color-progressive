@@ -1,0 +1,20 @@
+
+
+
+	tap random color
+		hue, saturation, and brightness
+		
+	swipe vertical
+		brightness
+		
+	swipe horizontal
+		hue
+		
+	pinch
+		saturation
+		
+	copy hex?
+		long press
+		double tap
+		
+	whole screen no menus
