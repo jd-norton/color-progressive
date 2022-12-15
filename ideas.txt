@@ -1,20 +1,37 @@
 
 
+	hue, saturation, and brightness
 
-	tap random color
-		hue, saturation, and brightness
-		
-	swipe vertical
+	random color controls
+		pc
+
+		mobile
+			double top
+
+	controls
 		brightness
-		
-	swipe horizontal
+			pc
+				Mouse drag vertical
+			mobile
+				swipe vertical
+
 		hue
-		
-	pinch
+			pc
+				mouse drag horizontal
+			mobile
+				swipe horizontal
+
+
 		saturation
-		
+			pc
+				right mouse drag verticals
+			mobile
+				two finger swipe
+
 	copy hex?
-		long press
-		double tap
-		
-	whole screen no menus
+		pc
+			double tap
+		mobile
+			long press
+
+whole screen no menus?
