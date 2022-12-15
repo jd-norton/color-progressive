@@ -1,6 +1,7 @@
 
-
 	hue, saturation, and brightness
+
+	recalculate units on window resize?
 
 	random color controls
 		pc

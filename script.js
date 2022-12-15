@@ -8,27 +8,27 @@ const box = document.getElementById("box");
 const text = document.getElementById("text");
 const height = box.clientHeight;
 const width = box.clientWidth;
-const vertUnit = height / 100;
-const horizontalUnit = width / 359;
+const verticalUnit = Math.round(height / 100) == 0 ? 1 : Math.round(height / 100);
+const horizontalUnit = Math.round(width / 360) == 0 ? 1 : Math.round(width / 360);
 
 let currentBrightness = 100;
 let currentHue = 0;
 let currentSaturation = 100;
+
 let currentX = 0;
 let currentY = height;
-
 let isDown = false;
 
 updateColor();
 
-function getYPos(clientY) {
-    return height - clientY;
+function getYPos(y) {
+    return height - y;
 }
 
 function onDownStart(x, y) {
     isDown = true;
     currentX = x;
-    currentY = y;
+    currentY = getYPos(y);
 }
 
 function onUpEnd() {
@@ -36,33 +36,41 @@ function onUpEnd() {
 }
 
 function updateColor() {
-    box.style.backgroundColor = "hsl(" + currentHue + ", " + currentSaturation + "%, " + currentBrightness + "%)";
-    text.style.color = "hsl(" + currentHue + ", 100%, " + currentBrightness + "%)";
-    text.innerHTML = "hsl(" + currentHue + ", " + currentSaturation + "%, " + currentBrightness + "%)";
-
-    //TODO: Weird reset when srolling vertical.
-    //text.innerHTML = "Y: " + currentY + " X: " + currentX;
+    let tempBrightness = currentBrightness == 360 ? 0 : currentBrightness;
+    box.style.backgroundColor = "hsl(" + currentHue + ", " + currentSaturation + "%, " + tempBrightness + "%)";
+    //text.style.color = "hsl(" + currentHue + ", 100%, " + tempBrightness + "%)";
+    text.innerHTML = "hsl(" + currentHue + ", " + currentSaturation + "%, " + tempBrightness + "%)";
 }
 
 function onMove(x, y) {
     if (!isDown) return;
+    let wasChange = false;
 
-    //TODO: Break out to be more readable
+    //TODO: Break out to be more readable?
     let changeX = x - currentX;
     let changeY = getYPos(y) - currentY;
-    
-    let changeBrightness = Math.round(changeY / vertUnit);
-    let changeHue = Math.round(changeX / horizontalUnit);
-    
-    if (changeBrightness != 0 ||changeHue != 0) {
+
+    if (Math.abs(changeX) >= horizontalUnit) {
+        if (changeX > 0) {
+            if (currentHue < 360) { currentHue++; }
+        } else {
+            if (currentHue > 0) { currentHue--; }
+        }
+        wasChange = true;
+    }
+
+    if (Math.abs(changeY) >= verticalUnit) {
+        if (changeY > 0) {
+            if (currentBrightness < 100) { currentBrightness++; }
+        } else {
+            if (currentBrightness > 0) { currentBrightness--; }
+        }
+        wasChange = true;
+    }
+
+    if (wasChange) {
         currentX = x;
         currentY = getYPos(y);
-        
-        let tempBrightness = currentBrightness + changeBrightness;
-        if (tempBrightness >= 0 && tempBrightness <= 100) currentBrightness = tempBrightness;
-        let tempHue = currentHue + changeHue;
-        if (tempHue >= 0 && tempHue <= 359) currentHue = tempHue;
-        
         updateColor();
     }
 }
