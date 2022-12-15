@@ -10,10 +10,6 @@ const height = box.clientHeight;
 const width = box.clientWidth;
 const verticalUnit = Math.round(height / 100) == 0 ? 1 : Math.round(height / 100);
 const horizontalUnit = Math.round(width / 360) == 0 ? 1 : Math.round(width / 360);
-console.log("height " + height);
-console.log("width " + width);
-console.log("vertUnit " + verticalUnit);
-console.log("horizontalUnit " + horizontalUnit);
 
 let currentBrightness = 100;
 let currentHue = 0;
