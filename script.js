@@ -83,7 +83,7 @@ function onMouseDown(e) {
     if (!window.mobileCheck) return;
     if (e.button !== 0 && e.button !== 2) return;
     let isMain = e.button == 0 ? true : false;
-    onDownStart(e.clientX, getYPos(e.clientY), isMain);
+    onDownStart(e.clientX, e.clientY, isMain);
 }
 
 function onMouseUp() {
