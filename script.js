@@ -11,13 +11,14 @@ const width = box.clientWidth;
 const verticalUnit = Math.round(height / 100) == 0 ? 1 : Math.round(height / 100);
 const horizontalUnit = Math.round(width / 360) == 0 ? 1 : Math.round(width / 360);
 
-let currentBrightness = 100;
-let currentHue = 0;
-let currentSaturation = 100;
+let currentBrightness = { value: 100 };
+let currentHue = { value: 0 };
+let currentSaturation = { value: 100 };
 
-let currentX = 0;
-let currentY = height;
-let isDown = false;
+let currentXY = { x: 0, y: 0 };
+
+let isMainDown = false;
+let isSecondaryDown = false;
 
 updateColor();
 
@@ -25,52 +26,54 @@ function getYPos(y) {
     return height - y;
 }
 
-function onDownStart(x, y) {
-    isDown = true;
-    currentX = x;
-    currentY = getYPos(y);
+function onDownStart(x, y, isMain) {
+    currentXY = { x: x, y: getYPos(y) };
+
+    if (isMain) {
+        isMainDown = true;
+    } else {
+        isSecondaryDown = true;
+    }
 }
 
 function onUpEnd() {
-    isDown = false;
+    isMainDown = false;
+    isSecondaryDown = false;
 }
 
 function updateColor() {
-    let tempBrightness = currentBrightness == 360 ? 0 : currentBrightness;
-    box.style.backgroundColor = "hsl(" + currentHue + ", " + currentSaturation + "%, " + tempBrightness + "%)";
-    //text.style.color = "hsl(" + currentHue + ", 100%, " + tempBrightness + "%)";
-    text.innerHTML = "hsl(" + currentHue + ", " + currentSaturation + "%, " + tempBrightness + "%)";
+    box.style.backgroundColor = "hsl(" + currentHue + ", " + currentSaturation.value + "%, " + currentBrightness.value + "%)";
+    //text.style.color = "hsl(" + tempHue + ", 100%, " + currentBrightness.value + "%)";
+    text.innerHTML = "hsl(" + currentHue + ", " + currentSaturation.value + "%, " + currentBrightness.value + "%)";
+}
+
+function changeCurrent(change, unit, limit, current) {
+    if (Math.abs(change) >= unit) {
+        if (change > 0) {
+            if (current.value < limit) { current.value++; }
+        } else {
+            if (current.value > 0) { current.value--; }
+        }
+    }
 }
 
 function onMove(x, y) {
-    if (!isDown) return;
-    let wasChange = false;
+    if (!isMainDown && !isSecondaryDown) return;
+    let original = [currentHue.value, currentSaturation.value, currentBrightness.value];
 
-    //TODO: Break out to be more readable?
-    let changeX = x - currentX;
-    let changeY = getYPos(y) - currentY;
+    let changeX = x - currentXY.x;
+    let changeY = getYPos(y) - currentXY.y;
 
-    if (Math.abs(changeX) >= horizontalUnit) {
-        if (changeX > 0) {
-            if (currentHue < 360) { currentHue++; }
-        } else {
-            if (currentHue > 0) { currentHue--; }
-        }
-        wasChange = true;
+    if (isMainDown) {
+        changeCurrent(changeX, horizontalUnit, 360, currentHue);
+        changeCurrent(changeY, verticalUnit, 100, currentBrightness);
+    } else {
+        changeCurrent(changeY, verticalUnit, 100, currentSaturation);
     }
 
-    if (Math.abs(changeY) >= verticalUnit) {
-        if (changeY > 0) {
-            if (currentBrightness < 100) { currentBrightness++; }
-        } else {
-            if (currentBrightness > 0) { currentBrightness--; }
-        }
-        wasChange = true;
-    }
-
-    if (wasChange) {
-        currentX = x;
-        currentY = getYPos(y);
+    let current = [currentHue.value, currentSaturation.value, currentBrightness.value];
+    if (!(original.length === current.length && original.every((element, index) => element === current[index]))) {
+        currentXY = { x: x, y: getYPos(y) };
         updateColor();
     }
 }
@@ -78,7 +81,9 @@ function onMove(x, y) {
 // PC Mouse Events
 function onMouseDown(e) {
     if (!window.mobileCheck) return;
-    onDownStart(e.clientX, getYPos(e.clientY));
+    if (e.button !== 0 && e.button !== 2) return;
+    let isMain = e.button == 0 ? true : false;
+    onDownStart(e.clientX, getYPos(e.clientY), isMain);
 }
 
 function onMouseUp() {
@@ -103,7 +108,9 @@ function onMouseWheel(e) {
 
 // Touch Events
 function onTouchStart(e) {
-    onDownStart(e.touches[0].pageX, e.touches[0].pageY);
+    if (e.touches.length > 2) return;
+    let isMain = e.touches.length == 1 ? true : false;
+    onDownStart(e.touches[0].pageX, e.touches[0].pageY, isMain);
 }
 
 function onTouchEnd() {
@@ -111,9 +118,16 @@ function onTouchEnd() {
 }
 
 function onTouchMove(e) {
+    if (e.touches.length > 2) return;
+
+    if (e.touches.length == 2) {
+        isMainDown = false;
+        isSecondaryDown = true;
+    }
     onMove(e.touches[0].pageX, e.touches[0].pageY);
 }
 
+window.addEventListener('contextmenu', function (e) { e.preventDefault(); }, false);
 text.addEventListener("touchstart", onTouchStart, false);
 text.addEventListener("touchend", onTouchEnd, false);
 text.addEventListener("touchmove", onTouchMove, false);
