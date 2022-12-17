@@ -42,9 +42,9 @@ function onUpEnd() {
 }
 
 function updateColor() {
-    box.style.backgroundColor = "hsl(" + currentHue + ", " + currentSaturation.value + "%, " + currentBrightness.value + "%)";
-    //text.style.color = "hsl(" + tempHue + ", 100%, " + currentBrightness.value + "%)";
-    text.innerHTML = "hsl(" + currentHue + ", " + currentSaturation.value + "%, " + currentBrightness.value + "%)";
+    box.style.backgroundColor = "hsl(" + currentHue.value + ", " + currentSaturation.value + "%, " + currentBrightness.value + "%)";
+    //text.style.color = "hsl(" + currentHue.value + ", 100%, " + currentBrightness.value + "%)";
+    text.innerHTML = "hsl(" + currentHue.value + ", " + currentSaturation.value + "%, " + currentBrightness.value + "%)";
 }
 
 function changeCurrent(change, unit, limit, current) {
