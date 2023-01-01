@@ -4,6 +4,13 @@ window.mobileCheck = function() {
     return isMobile;
 };
 
+if (navigator.serviceWorker) {
+    navigator.serviceWorker.register (
+        '/color-progressive/sw.js',
+        {scope: '/color-progressive/'}
+    )
+}
+
 const box = document.getElementById("box");
 const text = document.getElementById("text");
 const height = box.clientHeight;
